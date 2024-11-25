@@ -17,6 +17,7 @@ function setup() {
     walls.tile = "=";
     walls.collider = 'static';
     walls.color = '#313131';
+    walls.stroke = '#313131';
 
     new Tiles(
         [
