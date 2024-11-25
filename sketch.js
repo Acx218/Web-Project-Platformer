@@ -58,7 +58,8 @@ else if(keyIsDown(RIGHT_ARROW))
 {
 player.x += 5;
 }
-else if(keyIsDown(UP_ARROW))
+
+    if(keyIsDown(UP_ARROW))
 {
 player.vel.y = -5;
 }
@@ -67,11 +68,10 @@ player.vel.y = -5;
   
   if (frameCount % 120 === 0){ 
     let x = random(610, 70);
-    let y = random(70, 530);
+    let y = random(100, 530);
     platform = new Sprite();
     platform.x = x;
     platform.y = y;
     platform.collider = 'static';
-    platform.sleeping = true;
   }
   }
