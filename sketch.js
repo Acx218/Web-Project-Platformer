@@ -1,3 +1,10 @@
+// The tool I used is P5 Play.
+// What I learned about this tool is how to create sprite that a player can control as well as make one that can be collected when the player's sprite overlaps it as well as create a level using the built in Tiles function
+// I applied the beginner topics like the if statements to create the player controls as well as the the collision logic and coin logic
+
+// How I applied the intermediate topics was by using variables for collecting a coin and have that variable read so a score can be displayed I also used conditional logic for the player controls so the player cant jump forever.
+// I used iteration in the form of a if loop to create the coins in a random location on the canvas. I also used an array for the coins so that the player can collect any coin even after a new one is created.
+
 // Variables
 let player;
 let walls;
