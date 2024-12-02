@@ -1,16 +1,46 @@
+// Variables
 let player;
 let walls;
+let title;
+let canJump = true;
+let Timer;
+let elapsedTime = 0;
+let coins = [];
+let collectedCoins = 0;
+let timeRemaining = 60;
+let timerStarted = false;
+let lastTime = 0;
+let gameOver = false;
+
 function setup() {
-    createCanvas (680, 590);
+    // Create canvas and setup gravity
+    createCanvas(680, 590);
     world.gravity.y = 10;
+    textAlign(CENTER, CENTER); 
+    textSize(20);
+    startTime = millis(); // time in milliseconds
+
+    // Create player sprite
     player = new Sprite();
-	player.width = 15;
-	player.height = 15;
-    player.color = "blue"
-    player.stroke ="white"
+    player.width = 15;
+    player.height = 15;
+    player.color = "blue";
+    player.stroke = "white";
+    player.layer = 2;
     player.rotationLock = true;
 
+    // Create background title
+    title = new Sprite();
+    title.width = 190;
+    title.height = 50;
+    title.textSize = 40;
+    title.text = "Tile Jumper";
+    title.color = "gray";
+    title.stroke = "gray";
+    title.collider = 'none';
+    title.layer = 1;
 
+    // Create gray walls
     walls = new Group();
     walls.w = 30;
     walls.h = 30; 
@@ -19,60 +49,104 @@ function setup() {
     walls.color = '#313131';
     walls.stroke = '#313131';
 
+    // Creates the layout for the gray walls
     new Tiles(
         [
-        '======================',
-        '=....................=',
-        '=....................=',
-        '=....................=',
-        '=....................=',
-        '=....................=',
-        '=....................=',
-        '=....................=',
-        '=....................=',
-        '=....................=',
-        '=....................=',
-        '=....................=',
-        '=....................=',
-        '=....................=',
-        '=....................=',
-        '=....................=',
-        '=....................=',
-        '=....................=',
-        '======================',
+            '======================',
+            '=....................=',
+            '=....................=',
+            '=....................=',
+            '=....................=',
+            '=....................=',
+            '=....................=',
+            '=....................=',
+            '=....................=',
+            '=....................=',
+            '=....................=',
+            '=....................=',
+            '=....................=',
+            '=....................=',
+            '=....................=',
+            '=....................=',
+            '=....................=',
+            '=....................=',
+            '======================',
         ],
         25,
         25,
         walls.w,
-        walls.h,
-
-    )
+        walls.h
+    );
 }
 
 function draw() {
     background("gray");
-    if(keyIsDown(LEFT_ARROW))
-{
-player.x -= 5;
-}
-else if(keyIsDown(RIGHT_ARROW))
-{
-player.x += 5;
-}
 
-    if(keyIsDown(UP_ARROW))
-{
-player.vel.y = -5;
-}
+    // Start the timer when the game begins
+    if (!timerStarted) {
+        timerStarted = true;
+        startTime = millis(); // Capture the start time when the game begins
+    }
 
+    // Remaining time
+    elapsedTime = (millis() - startTime) / 1000;
+    timeRemaining = 60 - elapsedTime; // Subtract time from 60 for countdown
+
+    // Display the timer
+    text("Timer: " + Math.max(0, timeRemaining.toFixed(0)) + "s", width / 2, height / 10);
+
+    // Display collected coins
+    text("Coins Collected: " + collectedCoins, width / 2, height / 7);
+
+    // Player contorls
+    if (kb.pressing(LEFT_ARROW)) {
+        player.x -= 5;
+    } else if (kb.pressing(RIGHT_ARROW)) {
+        player.x += 5;
+    }
+
+    if (kb.presses(UP_ARROW) && canJump) {
+        player.vel.y = -7;
+        canJump = false;
+    }
+
+    // Game framerate
     frameRate(60);
-  
-  if (frameCount % 120 === 0){ 
-    let x = random(610, 70);
-    let y = random(100, 530);
-    platform = new Sprite();
-    platform.x = x;
-    platform.y = y;
-    platform.collider = 'static';
-  }
-  }
+    
+    // Every 60 frames spawn a new coin and add to array
+    if (frameCount % 60 === 0) { 
+        let x = random(610, 70);
+        let y = random(100, 530);
+        let coin = new Sprite();
+        coin.diameter = 30;
+        coin.x = x;
+        coin.y = y;
+        coin.color = "yellow";
+        coin.collider = 'static';
+        coins.push(coin);
+    }
+
+    // Check for collisions with gray walls
+    if (player.colliding(walls)) {
+        canJump = true;
+    }
+
+    // Check for overlap with each coin in the coins array
+    for (let i = coins.length - 1; i >= 0; i--) {
+        let coin = coins[i];
+
+        // Check player and coin overlap and removes it from array and adds colleted coin
+        if (player.overlaps(coin)) {
+            coin.remove(); 
+            coins.splice(i, 1);
+            collectedCoins++;
+        }
+    }
+
+    // Game over screen and stops game
+    if (timeRemaining <= 0 && !gameOver) {
+        gameOver = true;
+        text("Game Over!", width / 2, height / 3);
+        noLoop();
+    }
+}
